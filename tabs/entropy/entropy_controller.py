@@ -1,32 +1,26 @@
-"""Controller: Handles user interactions for Entropy tab"""
 import tkinter as tk
 from tkinter import messagebox
 import numpy as np
 
 
 class EntropyController:
-    """Coordinates between EntropyModel and EntropyView"""
+    """Το Controller λειτουργεί ως μεσολαβητής μεταξύ του Model και του View"""
 
     def __init__(self, model, view):
         self.model = model
         self.view = view
-
-        # Bind all button commands
         self._bind_commands()
 
     def _bind_commands(self):
-        """Connect buttons to handler methods"""
+        """Σύνδεση όλων των button σε μεθόδους"""
         self.view.calc_entropy_btn.config(command=self.handle_calc_entropy)
         self.view.calc_kl_btn.config(command=self.handle_calc_kl)
         self.view.calc_joint_btn.config(command=self.handle_calc_joint_entropy)
         self.view.calc_mi_btn.config(command=self.handle_calc_mutual_info)
         self.view.calc_cond_btn.config(command=self.handle_calc_conditional)
-    # ──────────────────────────────────────────────────────────────────
-    # Event Handlers
-    # ──────────────────────────────────────────────────────────────────
+
 
     def handle_calc_entropy(self):
-        """Handle entropy calculation"""
         try:
             p = [float(x) for x in self.view.prob_entry.get().split()]
 
@@ -50,11 +44,11 @@ class EntropyController:
             messagebox.showerror("Error", str(e))
 
     def handle_calc_kl(self):
-        """Handle KL divergence calculation"""
         try:
             P = [float(x) for x in self.view.P_entry.get().split()]
             Q = [float(x) for x in self.view.Q_entry.get().split()]
-
+            #split() για διαχωρισμό σε λίστα strings με βάση τα κενά διαστήματα όπως
+            #τα εισάγει ο χρήστης στη μορφή   0.5 0.4 0.1
             if len(P) != len(Q):
                 raise ValueError("Οι κατανομές πρέπει να έχουν ίδιο μήκος.")
 
@@ -78,7 +72,6 @@ class EntropyController:
             messagebox.showerror("Error", str(e))
 
     def handle_calc_joint_entropy(self):
-        """Handle joint entropy calculation"""
         try:
             px = [float(x) for x in self.view.px_entry.get().split()]
             py = [float(x) for x in self.view.py_entry.get().split()]
@@ -109,9 +102,7 @@ class EntropyController:
         except Exception as e:
             messagebox.showerror("Error", str(e))
 
-    # NEW HANDLER: Mutual Information I(X;Y)
     def handle_calc_mutual_info(self):
-        """Handle mutual information calculation I(X;Y)."""
         try:
             px = [float(x) for x in self.view.mi_px_entry.get().split()]
             py = [float(x) for x in self.view.mi_py_entry.get().split()]
@@ -128,7 +119,6 @@ class EntropyController:
             py_array = np.array(py)
             P_XY = np.vstack([px_array, py_array])
 
-            # Use existing model methods
             Hx = self.model.calculate_entropy(px)
             Hy = self.model.calculate_entropy(py)
             Hxy = self.model.calculate_joint_entropy(P_XY)
@@ -149,9 +139,7 @@ class EntropyController:
         except Exception as e:
             messagebox.showerror("Error", str(e))
 
-    # NEW HANDLER: Conditional Entropy H(Y|X), H(X|Y)
     def handle_calc_conditional(self):
-        """Handle conditional entropy calculation H(Y|X) and H(X|Y)."""
         try:
             px = [float(x) for x in self.view.cond_px_entry.get().split()]
             py = [float(x) for x in self.view.cond_py_entry.get().split()]
@@ -171,7 +159,6 @@ class EntropyController:
             Hy = self.model.calculate_entropy(py)
             Hxy = self.model.calculate_joint_entropy(P_XY)
 
-            # From the relationships:
             # H(Y|X) = H(X,Y) - H(X)
             # H(X|Y) = H(X,Y) - H(Y)
             Hy_given_x = Hxy - Hx

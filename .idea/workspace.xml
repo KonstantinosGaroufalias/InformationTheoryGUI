@@ -4,13 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ed3b5edb-8460-449e-ab83-94321831d657" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/InformationTheoryGUI.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="ed3b5edb-8460-449e-ab83-94321831d657" name="Changes" comment="Initial Commit">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tabs/channel/channel_controller.py" beforeDir="false" afterPath="$PROJECT_DIR$/tabs/channel/channel_controller.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tabs/channel/channel_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/tabs/channel/channel_model.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tabs/channel/channel_view.py" beforeDir="false" afterPath="$PROJECT_DIR$/tabs/channel/channel_view.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tabs/common/shared_ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/tabs/common/shared_ui.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tabs/entropy/entropy_controller.py" beforeDir="false" afterPath="$PROJECT_DIR$/tabs/entropy/entropy_controller.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tabs/entropy/entropy_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/tabs/entropy/entropy_model.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tabs/entropy/entropy_view.py" beforeDir="false" afterPath="$PROJECT_DIR$/tabs/entropy/entropy_view.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -32,6 +34,18 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;KonstantinosGaroufalias&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/KonstantinosGaroufalias/InformationTheoryGUI&quot;,
+    &quot;accountId&quot;: &quot;413413c4-fa46-4936-8689-72d84c69cd02&quot;
+  }
+}</component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 2
 }</component>
@@ -108,6 +122,15 @@
       <option name="presentableId" value="Default" />
       <updated>1763673539343</updated>
     </task>
+    <task id="LOCAL-00001" summary="Initial Commit">
+      <option name="closed" value="true" />
+      <created>1764695402110</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1764695402110</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -120,5 +143,9 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Initial Commit" />
+    <option name="LAST_COMMIT_MESSAGE" value="Initial Commit" />
   </component>
 </project>
