@@ -74,7 +74,6 @@ class ChannelView(SharedUI):
 
         self.calc_capacity_btn = self._button(f, "Υπολογισμός Χωρητικότητας", color=ModernDarkTheme.BG_LIGHT_ORANGE)
         self.calc_capacity_btn.grid(row=3, column=2, padx=6, pady=4)
-
         self.matrix_result = self._scrolled(f, 14)
         self.matrix_result.grid(row=4, column=0, columnspan=3, padx=6, pady=6, sticky="nsew")
 

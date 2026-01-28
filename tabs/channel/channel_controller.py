@@ -1,9 +1,5 @@
-"""Controller: Handles user interactions for Channel tab"""
-import tkinter as tk
 from tkinter import messagebox
 import numpy as np
-from app_theme.dark_theme import ModernDarkTheme
-
 
 class ChannelController:
 
@@ -65,8 +61,7 @@ class ChannelController:
                     raise ValueError(f"Γραμμή {i + 1}: Όλες οι τιμές πρέπει να είναι στο [0,1]")
 
                 if not np.isclose(sum(row_values), 1.0, atol=0.01):
-                    messagebox.showwarning("Προειδοποίηση",
-                                           f"Γραμμή {i + 1} αθροίζει σε {sum(row_values):.3f} (όχι 1.0)")
+                    messagebox.showwarning("Προειδοποίηση",f"Γραμμή {i + 1} αθροίζει σε {sum(row_values):.3f} (όχι 1.0)")
 
                 matrix_data.append(row_values)
 
