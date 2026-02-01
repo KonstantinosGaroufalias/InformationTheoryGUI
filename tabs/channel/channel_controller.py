@@ -1,8 +1,8 @@
 from tkinter import messagebox
 import numpy as np
 
-class ChannelController:
 
+class ChannelController:
     def __init__(self, model, view):
         self.model = model
         self.view = view
@@ -53,21 +53,11 @@ class ChannelController:
                 messagebox.showerror("Σφάλμα", "Μη βιάζεστε! Δημιουργήστε πρώτα έναν πίνακα!")
                 return
 
-            matrix_data = []
-            for i, row in enumerate(self.view.matrix_entries):
-                row_values = [float(entry.get()) for entry in row]
-
-                if not self.model.check_for_correct_probabilities(row_values):
-                    raise ValueError(f"Γραμμή {i + 1}: Όλες οι τιμές πρέπει να είναι στο [0,1]")
-
-                if not np.isclose(sum(row_values), 1.0, atol=0.01):
-                    messagebox.showwarning("Προειδοποίηση",f"Γραμμή {i + 1} αθροίζει σε {sum(row_values):.3f} (όχι 1.0)")
-
-                matrix_data.append(row_values)
-
+            # Extract matrix data (reusable function)
+            matrix_data = self._extract_matrix_data(self.view.matrix_entries, "Πίνακας")
             P_YX = np.array(matrix_data)
-            m = int(self.view.m_entry.get())
 
+            m = int(self.view.m_entry.get())
             if m <= 0:
                 raise ValueError("Το M πρέπει να είναι θετικός ακέραιος!")
 
@@ -87,62 +77,38 @@ class ChannelController:
                 messagebox.showerror("Σφάλμα", "Θετικός αριθμός μόνο!")
                 return
 
-            self.view.create_chain_matrix_frames(num_matrices, self.create_single_chain_matrix)
+            self.view.create_chain_matrices(num_matrices)
             self.view.display_chain_frames_created(num_matrices)
 
         except ValueError:
             messagebox.showerror("Σφάλμα", "Παρακαλώ εισάγετε έγκυρο ακέραιο!")
 
-    def create_single_chain_matrix(self, parent_frame, rows_entry, cols_entry):
-        try:
-            rows = int(rows_entry.get())
-            cols = int(cols_entry.get())
-
-            if rows <= 0 or cols <= 0:
-                messagebox.showerror("Σφάλμα", "Θετικοί αριθμοί μόνο!")
-                return
-
-            matrix_widget = None
-            for mw in self.view.chain_matrix_widgets:
-                if mw['frame'] == parent_frame:
-                    matrix_widget = mw
-                    break
-
-            if not matrix_widget:
-                return
-
-            self.view.create_single_chain_matrix_grid(matrix_widget, rows, cols)
-
-        except ValueError:
-            messagebox.showerror("Σφάλμα", "Παρακαλώ εισάγετε έγκυρους ακέραιους!")
-
     def handle_calculate_chain(self):
+        """Extract and validate all chain matrices - reuses same logic as 2nd subtab!"""
         try:
             matrices = []
-            for idx, mw in enumerate(self.view.chain_matrix_widgets):
-                if not mw['entries']:
+
+            # For each chain matrix, extract data (same way as 2nd subtab)
+            for idx, frame_data in enumerate(self.view.chain_frames):
+                if not frame_data['matrix_entries']:
                     raise ValueError(f"Ο Πίνακας {idx + 1} δεν έχει δημιουργηθεί!")
 
-                matrix_data = []
-                for row in mw['entries']:
-                    row_values = [float(entry.get()) for entry in row]
-
-                    if not self.model.check_for_correct_probabilities(row_values):
-                        raise ValueError(f"Για τον Πίνακα {idx + 1}: Οι τιμές θα πρέπει να είναι απο 0 έως 1!")
-
-                    matrix_data.append(row_values)
+                # Reuse the same extraction logic!
+                matrix_data = self._extract_matrix_data(frame_data['matrix_entries'], f"Πίνακας {idx + 1}")
                 matrices.append(np.array(matrix_data))
 
             if not matrices:
                 raise ValueError("Δημιουργήστε τουλάχιστον έναν πίνακα!")
 
+            # Check dimension compatibility for matrix multiplication
             is_valid, error_msg = self.model.check_for_matrix_dimensions(matrices)
             if not is_valid:
                 raise ValueError(f"Μη συμβατές διαστάσεις: {error_msg}")
 
+            # Combine matrices
             P_combined = self.model.combine_matrices(matrices)
-            m = int(self.view.m_chain_entry.get())
 
+            m = int(self.view.m_chain_entry.get())
             if m <= 0:
                 raise ValueError("Το M πρέπει να είναι θετικός ακέραιος!")
 
@@ -153,3 +119,26 @@ class ChannelController:
             messagebox.showerror("Σφάλμα", str(e))
         except Exception as e:
             messagebox.showerror("Σφάλμα", f"Σφάλμα υπολογισμού: {str(e)}")
+
+    def _extract_matrix_data(self, matrix_entries, matrix_name):
+        """
+        Reusable method to extract and validate matrix data from Entry widgets.
+        Works for both 2nd subtab (single matrix) and 3rd subtab (multiple matrices).
+        """
+        matrix_data = []
+
+        for i, row in enumerate(matrix_entries):
+            row_values = [float(entry.get()) for entry in row]
+
+            # Validate probabilities
+            if not self.model.check_for_correct_probabilities(row_values):
+                raise ValueError(f"{matrix_name} - Γραμμή {i + 1}: Όλες οι τιμές πρέπει να είναι στο [0,1]")
+
+            # Warn if row doesn't sum to 1
+            if not np.isclose(sum(row_values), 1.0, atol=0.01):
+                messagebox.showwarning("Προειδοποίηση",
+                                       f"{matrix_name} - Γραμμή {i + 1} αθροίζει σε {sum(row_values):.3f} (όχι 1.0)")
+
+            matrix_data.append(row_values)
+
+        return matrix_data

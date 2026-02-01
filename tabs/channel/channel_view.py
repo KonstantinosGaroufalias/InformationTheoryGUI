@@ -7,7 +7,6 @@ from tabs.common.shared_ui import SharedUI
 
 
 class ChannelView(SharedUI):
-
     def __init__(self, parent_notebook):
         self.parent_notebook = parent_notebook
         self.frame = tk.Frame(parent_notebook, bg=ModernDarkTheme.BG_FRAME)
@@ -21,7 +20,8 @@ class ChannelView(SharedUI):
         self._create_chain_subtab()
 
         self.matrix_entries = []
-        self.chain_matrix_widgets = []
+        self.chain_matrices = []
+        self.chain_frames = []
 
     def _create_bsc_subtab(self):
         f = tk.Frame(self.notebook, bg=ModernDarkTheme.BG_FRAME)
@@ -74,6 +74,7 @@ class ChannelView(SharedUI):
 
         self.calc_capacity_btn = self._button(f, "Υπολογισμός Χωρητικότητας", color=ModernDarkTheme.BG_LIGHT_ORANGE)
         self.calc_capacity_btn.grid(row=3, column=2, padx=6, pady=4)
+
         self.matrix_result = self._scrolled(f, 14)
         self.matrix_result.grid(row=4, column=0, columnspan=3, padx=6, pady=6, sticky="nsew")
 
@@ -89,21 +90,23 @@ class ChannelView(SharedUI):
                                 font=("Consolas", 11, "bold"))
         instructions.grid(row=0, column=0, columnspan=3, padx=6, pady=10)
 
+        # Input for number of matrices
         num_frame = tk.Frame(f, bg=ModernDarkTheme.BG_FRAME)
         num_frame.grid(row=1, column=0, columnspan=3, pady=6)
 
         tk.Label(num_frame, text="Αριθμός Πινάκων:", bg=ModernDarkTheme.BG_FRAME, fg=ModernDarkTheme.WHITE_TEXT,
                  font=("Consolas", 11)).grid(row=0, column=0, padx=4)
-
         self.num_matrices_entry = self._entry(num_frame, width=10, default="2")
         self.num_matrices_entry.grid(row=0, column=1, padx=4)
 
         self.create_chain_btn = self._button(num_frame, "Δημιουργία Πινάκων", color=ModernDarkTheme.BG_BLUISH)
         self.create_chain_btn.grid(row=0, column=2, padx=4)
 
-        self.chain_matrices_frame = tk.Frame(f, bg=ModernDarkTheme.BG_FRAME)
-        self.chain_matrices_frame.grid(row=2, column=0, columnspan=3, padx=6, pady=6, sticky="nsew")
+        # Scrollable container for all chain matrices
+        self.chain_container = tk.Frame(f, bg=ModernDarkTheme.BG_FRAME)
+        self.chain_container.grid(row=2, column=0, columnspan=3, padx=6, pady=6, sticky="nsew")
 
+        # Calculation section
         calc_frame = tk.Frame(f, bg=ModernDarkTheme.BG_FRAME)
         calc_frame.grid(row=3, column=0, columnspan=3, pady=6)
 
@@ -145,73 +148,95 @@ class ChannelView(SharedUI):
                 row_entries.append(entry)
             self.matrix_entries.append(row_entries)
 
-    def create_chain_matrix_frames(self, num_matrices, create_callback):
-        for widget in self.chain_matrices_frame.winfo_children():
+    def create_chain_matrices(self, num_matrices):
+        for widget in self.chain_container.winfo_children():
             widget.destroy()
-        self.chain_matrix_widgets = []
+
+        self.chain_matrices = []
+        self.chain_frames = []
 
         for idx in range(num_matrices):
-            matrix_frame = tk.LabelFrame(self.chain_matrices_frame, text=f"Πίνακας {idx + 1}",bg=ModernDarkTheme.BG_FRAME, fg=ModernDarkTheme.BG_BLUISH,font=("Consolas", 10, "bold"))
+            matrix_frame = tk.LabelFrame(self.chain_container, text=f"Πίνακας {idx + 1}",
+                                         bg=ModernDarkTheme.BG_FRAME, fg=ModernDarkTheme.BG_BLUISH,
+                                         font=("Consolas", 10, "bold"))
             matrix_frame.grid(row=idx, column=0, padx=10, pady=8, sticky="ew")
 
             dims_frame = tk.Frame(matrix_frame, bg=ModernDarkTheme.BG_FRAME)
             dims_frame.pack(pady=4)
 
-            tk.Label(dims_frame, text="Γραμμές:", bg=ModernDarkTheme.BG_FRAME, fg=ModernDarkTheme.WHITE_TEXT,font=("Consolas", 11)).grid(row=0, column=0, padx=2)
-
-            rows_entry = tk.Entry(dims_frame, width=5, bg=ModernDarkTheme.BG_ENTRY, fg=ModernDarkTheme.WHITE_TEXT,font=("Consolas", 11))
-            rows_entry.insert(0, "2")
+            tk.Label(dims_frame, text="Γραμμές:", bg=ModernDarkTheme.BG_FRAME, fg=ModernDarkTheme.WHITE_TEXT,
+                     font=("Consolas", 9)).grid(row=0, column=0, padx=2)
+            rows_entry = self._entry(dims_frame, width=5, default="2")
             rows_entry.grid(row=0, column=1, padx=2)
 
-            tk.Label(dims_frame, text="Στήλες:", bg=ModernDarkTheme.BG_FRAME, fg=ModernDarkTheme.WHITE_TEXT,font=("Consolas", 11)).grid(row=0, column=2, padx=2)
-
-            cols_entry = tk.Entry(dims_frame, width=5, bg=ModernDarkTheme.BG_ENTRY, fg=ModernDarkTheme.WHITE_TEXT,font=("Consolas", 11))
-            cols_entry.insert(0, "2")
+            tk.Label(dims_frame, text="Στήλες:", bg=ModernDarkTheme.BG_FRAME, fg=ModernDarkTheme.WHITE_TEXT,
+                     font=("Consolas", 9)).grid(row=0, column=2, padx=2)
+            cols_entry = self._entry(dims_frame, width=5, default="2")
             cols_entry.grid(row=0, column=3, padx=2)
 
-            create_btn = tk.Button(dims_frame, text="Δημιουργία", bg=ModernDarkTheme.BG_BLUISH, fg="#FFFFFF",font=("Consolas", 9),command=lambda mf=matrix_frame,
-                                                                                                                                                 re=rows_entry, ce=cols_entry: create_callback(mf, re,ce))
-            create_btn.grid(row=0, column=4, padx=4)
+            grid_container = tk.Frame(matrix_frame, bg=ModernDarkTheme.BG_FRAME)
+            grid_container.pack(pady=4)
 
-            entries_frame = tk.Frame(matrix_frame, bg=ModernDarkTheme.BG_FRAME)
-            entries_frame.pack(pady=4)
-
-            self.chain_matrix_widgets.append({
-                'frame': matrix_frame,
-                'entries_frame': entries_frame,
-                'entries': []
+            self.chain_frames.append({
+                'rows_entry': rows_entry,
+                'cols_entry': cols_entry,
+                'grid_container': grid_container,
+                'matrix_entries': []
             })
 
-    def create_single_chain_matrix_grid(self, matrix_widget, rows, cols):
-        for widget in matrix_widget['entries_frame'].winfo_children():
-            widget.destroy()
-        matrix_widget['entries'] = []
+            create_btn = self._button(dims_frame, "Δημιουργία", color=ModernDarkTheme.BG_BLUISH)
+            create_btn.grid(row=0, column=4, padx=4)
 
-        for i in range(rows):
-            row_entries = []
-            for j in range(cols):
-                entry = tk.Entry(matrix_widget['entries_frame'], width=8, bg="#393E46", fg=ModernDarkTheme.WHITE_TEXT,font=("Consolas", 11), justify='center',
-                                 insertbackground=ModernDarkTheme.WHITE_TEXT)
-                entry.insert(0, f"{1.0 / cols:.2f}")
-                entry.grid(row=i, column=j, padx=1, pady=1)
-                row_entries.append(entry)
-            matrix_widget['entries'].append(row_entries)
+            create_btn.config(command=lambda i=idx: self.create_single_chain_matrix(i))
+
+    def create_single_chain_matrix(self, matrix_idx):
+        frame_data = self.chain_frames[matrix_idx]
+
+        try:
+            rows = int(frame_data['rows_entry'].get())
+            cols = int(frame_data['cols_entry'].get())
+
+            if rows <= 0 or cols <= 0:
+                return False, "Θετικοί αριθμοί μόνο!"
+
+            for widget in frame_data['grid_container'].winfo_children():
+                widget.destroy()
+
+            frame_data['matrix_entries'] = []
+
+            for i in range(rows):
+                row_entries = []
+                for j in range(cols):
+                    entry = tk.Entry(frame_data['grid_container'], width=8, bg=ModernDarkTheme.BG_ENTRY,fg=ModernDarkTheme.WHITE_TEXT, font=("Consolas", 9), justify='center',
+                                     insertbackground=ModernDarkTheme.WHITE_TEXT)
+                    entry.insert(0, f"{1.0 / cols:.2f}")
+                    entry.grid(row=i, column=j, padx=2, pady=2)
+                    row_entries.append(entry)
+                frame_data['matrix_entries'].append(row_entries)
+
+            return True, ""
+        except ValueError:
+            return False, "Έγκυροι ακέραιοι απαιτούνται!"
 
     def update_bsc_plot(self, x_vals, y_vals, e, C):
         self.ax.clear()
+
         self.ax.set_facecolor(ModernDarkTheme.BG_FRAME)
         self.ax.plot(x_vals, y_vals, color=ModernDarkTheme.BG_BLUISH, lw=2, label='C_BSC(e)')
         self.ax.axvline(e, color=ModernDarkTheme.BG_LIGHT_ORANGE, ls="--", lw=1.5, label=f'e={e}')
-        self.ax.set_xlabel(" (e)", color=ModernDarkTheme.WHITE_TEXT, fontsize=10)
+
+        self.ax.set_xlabel("Πιθανότητα σφάλματος (e)", color=ModernDarkTheme.WHITE_TEXT, fontsize=10)
         self.ax.set_ylabel("Χωρητικότητα (bits/symbol)", color=ModernDarkTheme.WHITE_TEXT, fontsize=10)
-        self.ax.set_title("BSC plot", color=ModernDarkTheme.WHITE_TEXT, fontsize=12)
+
+        self.ax.set_title("BSC Graphic", color=ModernDarkTheme.WHITE_TEXT, fontsize=12)
+
         self.ax.legend(facecolor=ModernDarkTheme.BG_FRAME, edgecolor=ModernDarkTheme.WHITE_TEXT,labelcolor=ModernDarkTheme.WHITE_TEXT)
         self.ax.grid(True, alpha=0.2, color=ModernDarkTheme.WHITE_TEXT)
         self.canvas.draw()
 
     def display_bsc_result(self, e, C):
         self.bsc_result.delete("1.0", tk.END)
-        self.bsc_result.insert(tk.END, "Δυαδικό συμμετρικό κανάλη (BSC)\n")
+        self.bsc_result.insert(tk.END, "Δυαδικό συμμετρικό κανάλι (BSC)\n")
         self.bsc_result.insert(tk.END, f"e = {e}\n")
         self.bsc_result.insert(tk.END, f"Χωρητικότητα του BSC: C_BSC(e) = {C:.4f} bits/symbol\n")
 
@@ -244,7 +269,7 @@ class ChannelView(SharedUI):
             self.chain_result.insert(tk.END, f"Πίνακας P{idx + 1}:\n")
             self.chain_result.insert(tk.END, f"{matrix}\n\n")
 
-        self.chain_result.insert(tk.END, "Τελικός Πίνακας (P₁ × P₂ × ... × Pₙ):\n")
+        self.chain_result.insert(tk.END, "Τελικός Πίνακας (P₁ × P₂ × ..... × Pₙ):\n")
         self.chain_result.insert(tk.END, f"{P_combined}\n\n")
         self.chain_result.insert(tk.END, f"M = {m}\n\n")
         self.chain_result.insert(tk.END, f"Χωρητικότητα Αλυσίδας: C = {capacity:.4f} bits/symbol\n\n")
